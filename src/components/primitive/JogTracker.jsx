@@ -1,17 +1,7 @@
 import React from 'react';
 import iconJog from '../../images/jog/icon.png';
-const formatDate = (dt) => {
-  const str0l = (val, len) => {
-    var strVal = val.toString();
-    while (strVal.length < len)
-      strVal = '0' + strVal;
-    return strVal;
-  }
-  var year = dt.getFullYear();
-  var month = dt.getMonth() + 1;
-  var day = dt.getDate();
-  return str0l(day, 2) + '.' + str0l(month, 2) + '.' + year;
-}
+import { formatDate } from "../../utils";
+
 const JogTracker = ({date, distance, id, time, user_id}) => {
   const classCss = 'JogTracker';
   return(

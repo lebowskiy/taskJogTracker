@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import './App.css';
+import './App.scss';
 import MenuBar from './components/primitive/menubar';
 import ContentRoot from './components/complex/ContentRoot';
 

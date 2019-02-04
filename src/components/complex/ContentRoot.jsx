@@ -2,20 +2,19 @@ import React, {Fragment,PureComponent} from 'react';
 import {Redirect, Route, Switch, withRouter} from "react-router-dom"; 
 import Authorization from '../Authorization';
 import JogTrackerMain from './JogTrackerMain';
+import PageInfo from "./PageInfo";
 
 class ContentRoot extends PureComponent {
-  state = {
-    needToken: false,
-  }
   __renderRoutes = () => (
     <Switch>
       <Route exact path="/" component={Authorization} />
       <Route path="/userData" component={JogTrackerMain} />
+      <Route path="/info" component={PageInfo} />
     </Switch>
   )
   
   render() {
-    const needToken = JSON.parse(localStorage['authToken']);
+    let needToken = localStorage['authToken'];
     return (
       <Fragment>
       {

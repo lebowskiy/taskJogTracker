@@ -25,9 +25,9 @@ class MenuBar extends React.PureComponent {
         { isAuthorization &&
           <Fragment>
           <ul>
-          <li data-active={pathname === '/userData'}>Jogs</li>
-          <li data-active={pathname === '/info'}>Info</li>
-          <li data-active={pathname === '/contact'}>Contact us</li>
+          <li onClick={() => this.props.history.push('/userData')}>Jogs</li>
+          <li onClick={() => this.props.history.push('/info')}>Info</li>
+          <li onClick={() => this.props.history.push('/contact')}>Contact us</li>
           </ul>
           <div className={classCss + '_add'}>
           </div>

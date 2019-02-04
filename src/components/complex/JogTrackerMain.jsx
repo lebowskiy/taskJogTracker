@@ -1,62 +1,146 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import fetch from 'isomorphic-fetch';
 import { userDataJogTrackerServiceURL, authUserTokenJogTrackerServiceURL } from '../../services';
-import {withRouter} from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import JogTracker from '../primitive/JogTracker';
+import { IMaskInput } from "react-imask";
+import { formatStringToDate } from '../../utils';
+import {connect} from 'react-redux';
+import smilePic from '../../images/smile/sad-rounded-square-emoticon.png';
+import add from '../../images/Add/add.png';
+import NewJogForm from "../primitive/NewJogForm";
+import { addNewJogs, saveJogsData } from "../../actions/jogs";
+
 
 class JogTrackerMain extends React.Component {
-  state = {
-    isLoadingData: false,
-    users: undefined,
-    jogs: undefined,
-  }
-  componentDidMount() {
-    this.getUserJogTrackerData()
-  }
-  getUserJogTrackerData = () => {
-    let token = JSON.parse(localStorage['authToken']);
-    console.log("token", token)
-    let fetchOptions = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token.access_token}`
-      },
-    }
-    console.log("fetchOptions", fetchOptions)
-    this.setState({isLoadingData: true});
-    fetch(userDataJogTrackerServiceURL, fetchOptions).then((response) => {
-      console.log("response", response)
-		if (response.status === 200) {
-      return response.json();
-		} else {
-      throw new Error("Bad response from server");
-    }
-	}).then((stories) => {
-    console.log("stories", stories);
-    this.setState({
-      jogs: stories.response.jogs,
-      users: stories.response.users,
-      isLoadingData: false,
-    })
-  })
-  }
+    state = {
+        isLoadingData: false,
+        newJog: false,
+        users: undefined,
+        jogs: undefined,
+        toDate: null,
+        fromDate: null,
+    };
 
-  render() {
-    const {isLoadingData} = this.state;
-    console.log("this.state", this.state)
-    const classCss = 'JogTrackerMain';
-    if(isLoadingData) return <div>Loading data...</div>
-    return(
-      <div>
-        <div className={classCss + '__filter'}>
-        </div>
-        <div className={classCss + '__listJogs'}>
-          {this.state.jogs && this.state.jogs.map((el,i) =>  { return <JogTracker key={i} {...el}/>})}
-        </div>
-      </div>
-    )
-  }
+    componentDidMount() {
+        if(this.props.jogsData.length === 0) {
+            this.getUserJogTrackerData()
+        }
+    }
+
+    getUserJogTrackerData = () => {
+        let token = JSON.parse( localStorage[ 'authToken' ] );
+        console.log( "token", token );
+        let fetchOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token.access_token}`
+            },
+        };
+        this.setState( { isLoadingData: true } );
+        fetch( userDataJogTrackerServiceURL, fetchOptions ).then( ( response ) => {
+            if ( response.status === 200 ) {
+                return response.json();
+            } else {
+                throw new Error( "Bad response from server" );
+            }
+        } ).then( ( stories ) => {
+            this.props.saveJogsData(stories.response.jogs);
+            this.setState( {
+                jogs: stories.response.jogs,
+                users: stories.response.users,
+                isLoadingData: false,
+            } )
+        } )
+    };
+
+    fromFilterDate = ( date ) => {
+        this.setState( {
+            fromDate: formatStringToDate( date )
+        } )
+    };
+
+    toFilterDate = ( date ) => {
+        this.setState( {
+            toDate: formatStringToDate( date )
+        } )
+    };
+
+    addNewJog = () => this.setState( { newJog: true } );
+
+    getNewJog = (data) => {
+        this.props.addNewJogs(data);
+      console.log("data",data)
+    };
+
+    render() {
+        const { isLoadingData, fromDate, toDate, newJog } = this.state;
+        const { jogsData, isLoaded } = this.props;
+        const { addNewJog, getNewJog } = this;
+        console.log( "this.props", this.props );
+        const classCss = 'JogTrackerMain';
+        const reBuildArr = isLoaded ? jogsData.filter( jog => {
+            if ( fromDate !== null && toDate !== null ) {
+                if ( new Date( jog.date ).getTime() >= fromDate.getTime() && new Date( jog.date ).getTime() <= toDate.getTime() ) {
+                    return jog
+                }
+            } else return jog
+        } ) : [];
+        if ( !isLoaded ) return <div>Loading data...</div>
+        return (
+            <div className={ classCss }>
+                <div className={ classCss + '__filter' }>
+                    <div className={ classCss + '__filter__input' }>
+                        <span>Date from</span>
+                        <IMaskInput
+                            mask={ Date }
+                            radix="."
+                            onAccept={ this.fromFilterDate }
+                            placeholder='DD.MM.YYYY'
+                        />
+                    </div>
+                    <div className={ classCss + '__filter__input' }>
+                        <span>Date to</span>
+                        <IMaskInput
+                            mask={ Date }
+                            radix="."
+                            onAccept={ this.toFilterDate }
+                            placeholder='DD.MM.YYYY'
+                        />
+                    </div>
+                </div>
+                <div className={classCss + "__content"}>
+                {
+                    newJog ?
+                    <NewJogForm cbGetData={getNewJog}
+                                 cbClosed={() => this.setState({newJog: false})}/> :
+                    <Fragment>
+                        <div className={ classCss + '__listJogs' }>
+                            {
+                                isLoaded && reBuildArr.length === 0 ?
+                                <div className={ classCss + '__empty' }>
+                                    <img src={ smilePic }/>
+                                    Nothing find
+                                </div> :
+                                reBuildArr.map( ( el, i ) => { return <JogTracker key={ i } { ...el }/>} )
+                            }
+                        </div>
+                        <div className={ classCss + '__btn-add' }>
+                            <img src={ add } onClick={ addNewJog }/>
+                        </div>
+                    </Fragment>
+                }
+                </div>
+            </div>
+        )
+    }
 }
-export default withRouter(JogTrackerMain);
+
+export default withRouter( connect(({jogs}) => {
+    return {
+        jogsData: jogs.jogsData,
+        isLoaded: jogs.isLoaded
+    }
+}, {saveJogsData, addNewJogs})(JogTrackerMain) );
