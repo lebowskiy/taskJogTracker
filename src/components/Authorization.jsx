@@ -1,5 +1,6 @@
 import React, {Fragment} from 'react';
-import logoLogin from '../images/assets_01_2019-02-02/bear-face.png'
+import logoLogin from '../images/assets_01_2019-02-02/bear-face.png';
+import logoLoginMobile from '../images/mobile-logo/bearFace.png';
 import fetch from 'isomorphic-fetch';
 import { getTokenJogTrackerServiceURL } from '../services';
 import {withRouter, Redirect} from 'react-router-dom';
@@ -10,6 +11,21 @@ class Authorization extends React.PureComponent {
     isLoadingResp: false,
     redirect: false,
   }
+
+    constructor(props) {
+        super(props);
+        this.state = { width: 0, height: 0 };
+        this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+    }
+
+    componentDidMount() {
+        this.updateWindowDimensions();
+        window.addEventListener('resize', this.updateWindowDimensions);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.updateWindowDimensions);
+    }
 
   getToken = () => {
     let fetchOptions = {
@@ -39,13 +55,17 @@ class Authorization extends React.PureComponent {
     // this.props.history.push('/userData')
 
 	});
-  }
+  };
+
+    updateWindowDimensions() {
+        this.setState({ width: window.innerWidth, height: window.innerHeight });
+    }
 
   render() {
     const classCss = 'Authorization';
     const {getToken} = this;
     const {isLoadingResp, redirect} = this.state;
-    console.log("this.props", this.props)
+    console.log("Authorization", this.state)
     if(redirect) return <Redirect to={'/userData'}/>
     return(
       <div className={classCss}>
@@ -54,7 +74,7 @@ class Authorization extends React.PureComponent {
           isLoadingResp ? 
           "Loading..." :     
           <Fragment> 
-            <img alt={'logo'} src={logoLogin}/>
+            <img alt={'logo'} src={ this.state.width >= 760 ? logoLogin : logoLoginMobile}/>
             <button onClick = {getToken}>Let me in</button>
           </Fragment>
         }

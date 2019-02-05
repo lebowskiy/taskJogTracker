@@ -1,3 +1,8 @@
+* {
+    box-sizing: border-box;
+}
+$break-small: 760px;
+$break-large: 1200px;
 .MenuBar {
   display: flex;
   align-items: center;
@@ -5,35 +10,137 @@
   height: 116px;
   background-color: #7ed321;
   padding: 0 30px;
-}
-.MenuBar__menu ul {
-   display: flex;
-   align-items: center;
-   justify-content: flex-start;
-   flex-direction: row;
-}
-.MenuBar__menu ul li {
-  list-style-type: none;
-  font-size: 14px;
-  font-weight: bold;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: normal;
-  letter-spacing: normal;
-  text-align: center;
-  text-transform: uppercase;
-  color: white;
-    &:hover{
-        cursor: pointer;
-        border-bottom: 1px solid white;
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+    &[data-visible = 'true'] {
+        background-color: white;
     }
-    &[data-active = 'true'] {
-    border-bottom: 1px solid white;
+    @media screen  and (max-width: $break-small) {
+        position: unset;
     }
-    &:not(:last-child) {
-        margin-right: 46px;
+    &__menu-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        width: 30px;
+        height: 24px;
+        margin-left: 32px;
+        &[data-menuvisible = 'true'] {
+            & span:nth-child(2) {
+                display: none;
+            }
+            & span:first-child {
+                transform: rotate(45deg) translate(7px, -1px);
+                background-color: gray;
+            }
+            & span:last-child {
+                transform: rotate(-45deg) translate(7px, 0);
+                background-color: gray;
+            }
+        }
+        & span {
+            width: 30px;
+            height: 4px;
+            margin-bottom: 5px;
+            background-color: white;
+        }
+    }
+
+}
+.MenuBar__menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    @media screen  and (max-width: $break-small) {
+        flex-flow: row-reverse;
+    }
+    &__icon-filter {
+        margin-left: 56px;
+
+    }
+    & ul {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-direction: row;
+        @media screen  and (max-width: $break-small) {
+            display: none;
+            &[data-menu = 'true'] {
+                display: flex;
+                position: absolute;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: white;
+                color: black;
+                flex-direction: column;
+                z-index: 1000;
+                top: 0;
+                padding: 0;
+                margin-top: 116px;
+                align-items: center;
+                justify-content: center;
+                & li {
+                    color: black;
+                    font-size: 32px;
+                    margin-bottom: 32px;
+                    margin-right: 0;
+                    &[data-active = 'true'] {
+                        color: forestgreen;
+                    }
+                    &:not(:last-child) {
+                        margin-right: 0;
+                    }
+                }
+            }
+            &[data-menu = 'false'] {
+                display: none;
+            }
+        }
+
+        & li {
+            list-style-type: none;
+            font-size: 14px;
+            font-weight: bold;
+            font-style: normal;
+            font-stretch: normal;
+            line-height: normal;
+            letter-spacing: normal;
+            text-align: center;
+            text-transform: uppercase;
+            color: white;
+            position: relative;
+            &:hover {
+                cursor: pointer;
+                &:after {
+                    content: '';
+                    position: absolute;
+                    display: block;
+                    width: 100%;
+                    height: 2px;
+                    bottom: -3px;
+                    background-color: white;
+                }
+            }
+            &[data-active = 'true']:after {
+                content: '';
+                position: absolute;
+                display: block;
+                width: 100%;
+                height: 2px;
+                bottom: -3px;
+                background-color: white;
+            }
+            &:not(:last-child) {
+                margin-right: 46px;
+            }
+        }
     }
 }
+
 .Authorization {
   display: flex;
   height: 100vh;
@@ -55,6 +162,11 @@
         line-height: normal;
         letter-spacing: normal;
         color: white;
+        @media screen  and (max-width: $break-small) {
+            border: 3px solid rgb(233, 144, 249);
+            color: rgb(233, 144, 249);
+
+        }
     }
   &__login {
     display: flex;
@@ -65,6 +177,11 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+      @media screen  and (max-width: $break-small) {
+          background-color: inherit;
+          width: 100%;
+          height: 100%;
+      }
   }
 }
 
@@ -77,7 +194,15 @@ button:hover {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    padding-top: 85px;
+    padding-top: 116px;
+    height: 100vh;
+    @media screen  and (max-width: $break-small) {
+        padding-top: 0;
+        padding-left: 32px;
+        padding-right: 32px;
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
     h2 {
         font-size: 36px;
         font-weight: bold;
@@ -95,10 +220,56 @@ button:hover {
 }
 .JogTrackerMain {
   display: flex;
-    min-height: 100%;
+    height: 100vh;
     position: relative;
     flex-direction: column;
     width: 100%;
+    padding-top: 116px;
+    @media screen  and (max-width: $break-small) {
+        padding-top: 0;
+        height: 100%;
+    }
+    &__empty-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        padding-top: 120px;
+        & img {
+            margin-bottom: 47px;
+        }
+        & p {
+            font-size: 24px;
+            font-weight: normal;
+            font-style: normal;
+            font-stretch: normal;
+            line-height: 1.21;
+            letter-spacing: normal;
+            text-align: center;
+            margin-bottom: 120px;
+            color: gray;
+        }
+        & button {
+            width: 249px;
+            height: 60px;
+            border-radius: 36px;
+            font-size: 18px;
+            font-weight: bold;
+            font-style: normal;
+            font-stretch: normal;
+            line-height: normal;
+            letter-spacing: normal;
+            border: 3px solid #e990f9;
+            background-color: inherit;
+            color: #e990f9;
+            &:hover {
+                cursor: pointer;
+                background-color: #e990f9;
+                color: white;
+            }
+        }
+    }
     &__content {
         display: flex;
         align-items: center;
@@ -141,6 +312,10 @@ button:hover {
         justify-content: center;
         flex-direction: column;
         padding-top: 53px;
+        @media screen  and (max-width: $break-small) {
+            width: 100%;
+            padding-top: 16px;
+        }
     }
     &__filter {
         display: flex;
@@ -181,6 +356,13 @@ button:hover {
   justify-content: flex-start;
   flex-direction: row;
   margin-bottom: 88px;
+    @media screen  and (max-width: $break-small) {
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 0;
+        padding: 32px 0;
+        border-bottom: 1px solid lightgray;
+    }
     & img {
         margin-right: 45px;
     }
@@ -197,11 +379,19 @@ button:hover {
     box-sizing: border-box;
     position: relative;
     top: 115px;
-
+    @media screen  and (max-width: $break-small) {
+        padding: 32px;
+        width: 80%;
+    }
     &__btn-close {
         position: absolute;
         top: 24px;
         right: 27px;
+        transition: transform .5s ease;
+        &:hover {
+            cursor: pointer;
+            transform: scale(1.05);
+        }
     }
     &__field {
         display: flex;
@@ -209,6 +399,18 @@ button:hover {
         justify-content: space-between;
         flex-direction: row;
         margin-bottom: 25px;
+        @media screen  and (max-width: $break-small) {
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            & span {
+                padding-bottom: 8px;
+                font-size: 18px;
+            }
+            & input {
+                width: 100%;
+            }
+        }
         & span {
             font-size: 16px;
             font-weight: bold;

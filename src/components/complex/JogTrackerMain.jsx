@@ -8,6 +8,7 @@ import { formatStringToDate } from '../../utils';
 import {connect} from 'react-redux';
 import smilePic from '../../images/smile/sad-rounded-square-emoticon.png';
 import add from '../../images/Add/add.png';
+import sadIcon from '../../images/sad-icon/sad-rounded-square-emoticon.png';
 import NewJogForm from "../primitive/NewJogForm";
 import { addNewJogs, saveJogsData } from "../../actions/jogs";
 
@@ -81,6 +82,17 @@ class JogTrackerMain extends React.Component {
         const { addNewJog, getNewJog } = this;
         console.log( "this.props", this.props );
         const classCss = 'JogTrackerMain';
+        if ( !isLoaded ) return <div>Loading data...</div>;
+        if(jogsData.length === 0) return (
+            <div className={classCss}>
+                <div className={classCss + '__empty-content'}>
+                    <img src={sadIcon}/>
+                    <p>Nothing is there</p>
+                    <button onClick={ addNewJog }>Create your first jog</button>
+                </div>
+
+            </div>
+        );
         const reBuildArr = isLoaded ? jogsData.filter( jog => {
             if ( fromDate !== null && toDate !== null ) {
                 if ( new Date( jog.date ).getTime() >= fromDate.getTime() && new Date( jog.date ).getTime() <= toDate.getTime() ) {
@@ -88,29 +100,33 @@ class JogTrackerMain extends React.Component {
                 }
             } else return jog
         } ) : [];
-        if ( !isLoaded ) return <div>Loading data...</div>
+
         return (
             <div className={ classCss }>
-                <div className={ classCss + '__filter' }>
-                    <div className={ classCss + '__filter__input' }>
-                        <span>Date from</span>
-                        <IMaskInput
-                            mask={ Date }
-                            radix="."
-                            onAccept={ this.fromFilterDate }
-                            placeholder='DD.MM.YYYY'
-                        />
+                {
+                    this.props.filter &&
+                    <div className={ classCss + '__filter' }>
+                        <div className={ classCss + '__filter__input' }>
+                            <span>Date from</span>
+                            <IMaskInput
+                                mask={ Date }
+                                radix="."
+                                onAccept={ this.fromFilterDate }
+                                placeholder='DD.MM.YYYY'
+                            />
+                        </div>
+                        <div className={ classCss + '__filter__input' }>
+                            <span>Date to</span>
+                            <IMaskInput
+                                mask={ Date }
+                                radix="."
+                                onAccept={ this.toFilterDate }
+                                placeholder='DD.MM.YYYY'
+                            />
+                        </div>
                     </div>
-                    <div className={ classCss + '__filter__input' }>
-                        <span>Date to</span>
-                        <IMaskInput
-                            mask={ Date }
-                            radix="."
-                            onAccept={ this.toFilterDate }
-                            placeholder='DD.MM.YYYY'
-                        />
-                    </div>
-                </div>
+                }
+
                 <div className={classCss + "__content"}>
                 {
                     newJog ?
@@ -138,9 +154,10 @@ class JogTrackerMain extends React.Component {
     }
 }
 
-export default withRouter( connect(({jogs}) => {
+export default withRouter( connect(({jogs, saveState}) => {
     return {
         jogsData: jogs.jogsData,
-        isLoaded: jogs.isLoaded
+        isLoaded: jogs.isLoaded,
+        filter: saveState.filter,
     }
 }, {saveJogsData, addNewJogs})(JogTrackerMain) );

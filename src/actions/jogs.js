@@ -11,6 +11,15 @@ export const saveJogsData = (data) => {
 
     }
 };
+export const saveState = (key, data) => {
+    return {
+        type: 'SAVE_VALUE_STATE',
+        payload: {
+            componentKey: key,
+            value: data
+        }
+    }
+};
 export const addNewJogs = (jog) => (dispatch, getState) => {
     let refactorArr = getState().jogs.jogsData;
     refactorArr.push(jog);
@@ -39,4 +48,4 @@ export const addNewJogs = (jog) => (dispatch, getState) => {
             throw new Error( "Bad response from server" );
         }
     } )
-}
+};
